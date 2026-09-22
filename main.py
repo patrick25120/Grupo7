@@ -1,26 +1,60 @@
-from paciente import Paciente 
-from medico import Medico 
-from buscarcodigo import Buscar_codigo 
-from cita import Progama_cita 
-from registro import Atencion 
+from paciente import Paciente
+from medico import Medico
+from buscarcodigo import Buscar_codigo
+from cita import Progama_cita
+from registro import Atencion
+
 
 def main():
 
+    pacientes = []
+
     print("=== REGISTRO DE PACIENTE ===")
 
-    codigo_paciente = input("Ingrese el código del paciente: ")
-    nombre_paciente = input("Ingrese el nombre del paciente: ")
-    edad = int(input("Ingrese la edad: "))
-    dni = input("Ingrese el DNI: ")
+    while True:
 
-    paciente = Paciente(
-        codigo_paciente,
-        nombre_paciente,
-        edad
-    )
+        codigo_paciente = input("Ingrese el código del paciente: ")
 
-    print("\nPaciente registrado:")
-    print(paciente.resumen())
+        duplicado = False
+
+        for p in pacientes:
+            if p.codigo == codigo_paciente:
+                duplicado = True
+
+        if duplicado:
+            print("Error: el código ya está registrado.")
+        else:
+            nombre_paciente = input("Ingrese el nombre del paciente: ")
+
+            edad_texto = input("Ingrese la edad: ")
+
+            if not edad_texto.isdigit():
+                print("Error: la edad debe ser numérica.")
+                continue
+
+            edad = int(edad_texto)
+
+            if edad < 0 or edad > 120:
+                print("Error: la edad debe estar entre 0 y 120.")
+                continue
+
+            dni = input("Ingrese el DNI: ")
+
+            paciente = Paciente(
+                codigo_paciente,
+                nombre_paciente,
+                edad
+            )
+
+            pacientes.append(paciente)
+
+            print("\nPaciente registrado:")
+            print(paciente.resumen())
+
+        otra = input("\n¿Desea registrar otro paciente? (s/n): ")
+
+        if otra.lower() != "s":
+            break
 
 
     print("\n=== REGISTRO DE MÉDICO ===")
@@ -73,11 +107,26 @@ def main():
     print("\n=== PROGRAMAR CITA ===")
 
     codigo_cita = input("Ingrese el código de la cita: ")
+
+    codigo_paciente_cita = input(
+        "Ingrese el código del paciente para la cita: "
+    )
+
+    paciente_encontrado = None
+
+    for p in pacientes:
+        if p.codigo == codigo_paciente_cita:
+            paciente_encontrado = p
+
+    if paciente_encontrado == None:
+        print("Error: el paciente no existe.")
+        return
+
     fecha = input("Ingrese la fecha de la cita: ")
 
     cita = Progama_cita(
         codigo_cita,
-        paciente.nombre,
+        paciente_encontrado.nombre,
         medico.nombre,
         fecha
     )
@@ -89,9 +138,9 @@ def main():
     print("\n=== REGISTRAR ATENCIÓN ===")
 
     atencion = Atencion(
-        paciente.nombre,
+        paciente_encontrado.nombre,
         dni,
-        paciente.codigo,
+        paciente_encontrado.codigo,
         medico.especialidad,
         medico.codigo
     )
@@ -106,9 +155,9 @@ def main():
     print("          CITA REGISTRADA")
     print("===================================")
     print("Código de cita:", cita.codigo)
-    print("Paciente:", paciente.nombre)
+    print("Paciente:", paciente_encontrado.nombre)
     print("DNI:", dni)
-    print("Edad:", paciente.edad)
+    print("Edad:", paciente_encontrado.edad)
     print("Médico:", medico.nombre)
     print("Código médico:", medico.codigo)
     print("Especialidad:", medico.especialidad)
@@ -118,4 +167,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
